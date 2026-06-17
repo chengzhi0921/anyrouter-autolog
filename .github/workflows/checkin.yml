@@ -1,7 +1,7 @@
 name: AnyRouter 自动签到
 on:
   schedule:
-    - cron: '10 */8 * * *'
+    - cron: '36 */7 * * *'
   workflow_dispatch:
 
 jobs:
@@ -68,7 +68,17 @@ jobs:
         key: balance-hash-${{ github.sha }}
         restore-keys: |
           balance-hash-
-
+          
+    # ========== 新增：模拟真实用户行为的随机延迟 ==========
+    - name: 随机延迟 (防风控)
+      run: |
+        # 生成 0 到 300 秒之间的随机数
+        $delay = Get-Random -Minimum 0 -Maximum 301
+        Write-Host "🤖 模拟真实用户行为：即将随机等待 $delay 秒后再开始签到..."
+        Start-Sleep -Seconds $delay
+        Write-Host "⏰ 等待结束，准备执行签到..."
+    # ===================================================
+    
     - name: 执行签到
       env:
         ANYROUTER_ACCOUNTS: ${{ secrets.ANYROUTER_ACCOUNTS }}
